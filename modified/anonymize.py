@@ -22,7 +22,7 @@ parser.add_argument('--dataset', type=str, default='adult',
 class Anonymizer:
     def __init__(self, args):
         self.method = args.method
-        assert self.method in ["mondrian", "topdown", "cluster", "mondrian_ldiv", "classic_mondrian", "datafly"]
+        assert self.method in ["mondrian", "topdown", "cluster", "mondrian_ldiv", "classic_mondrian", "datafly", "modified_mondrian"]
         self.k = args.k
         self.data_name = args.dataset
         self.csv_path = args.dataset+'.csv'

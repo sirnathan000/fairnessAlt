@@ -8,6 +8,7 @@ class Dataset(Enum):
     CMC = 'cmc'
     MGM = 'mgm'
     ADULT = 'adult'
+    ADULT2 = 'adult2'
     CAHOUSING = 'cahousing'
     INFORMS = 'informs'
     ITALIA = 'italia'
