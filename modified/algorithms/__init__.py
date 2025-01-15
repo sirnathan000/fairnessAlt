@@ -24,6 +24,15 @@ def k_anonymize(anon_params):
             anon_params["qi_index"], 
             anon_params["sa_index"])
 
+    if anon_params["name"] == AnonMethod.MODIFIED_MONDRIAN:
+        return basic_mondrian_anonymize(
+            anon_params["value"],
+            anon_params["att_trees"],
+            anon_params["data"],
+            anon_params["qi_index"],
+            anon_params["sa_index"])
+
+
     if anon_params["name"] == AnonMethod.MONDRIAN_LDIV:
         return mondrian_ldiv_anonymize(
             anon_params["value"], 

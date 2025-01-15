@@ -31,6 +31,9 @@ class AnonMethod(Enum):
     # Basic Mondrian
     BASIC_MONDRIAN = 'mondrian'
 
+    # modified Mondrian
+    MODIFIED_MONDRIAN = 'modified_mondrian'
+
     # Mondrian L-diversity
     MONDRIAN_LDIV = "mondrian_ldiv"
     
