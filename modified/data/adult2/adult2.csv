@@ -30161,3 +30161,7 @@ ID;sex;age;race;marital-status;education;native-country;workclass;occupation;sal
 30159;Female;58;White;Widowed;HS-grad;United-States;Private;Adm-clerical;<=50K
 30160;Male;22;White;Never-married;HS-grad;United-States;Private;Adm-clerical;<=50K
 30161;Female;52;White;Married-civ-spouse;HS-grad;United-States;Self-emp-inc;Exec-managerial;>50K
+30162;Female;52;White;Married-civ-spouse;HS-grad;United-States;Self-emp-inc;Exec-managerial;>50K
+30163;Female;52;White;Married-civ-spouse;HS-grad;United-States;Self-emp-inc;Exec-managerial;>50K
+30164;Female;52;White;Married-civ-spouse;HS-grad;United-States;Self-emp-inc;Exec-managerial;>50K
+30165;Female;52;White;Married-civ-spouse;HS-grad;United-States;Self-emp-inc;Exec-managerial;>50K
