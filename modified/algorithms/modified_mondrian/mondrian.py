@@ -9,9 +9,15 @@ import pdb
 import time
 from functools import cmp_to_key
 
+
+
 from tqdm import tqdm
 from .models.numrange import NumRange
 from .utils.utility import cmp_str
+
+#for ratio
+from sklearn.preprocessing import LabelEncoder
+from aif360.sklearn.metrics import disparate_impact_ratio
 
 __DEBUG = False
 QI_LEN = 8
@@ -63,6 +69,90 @@ def get_normalized_width(partition, index):
         width = partition.width[index]
     return width * 1.0 / QI_RANGE[index]
 
+def altRatio(data, QI, Protected, goal, outcome):
+    import pandas as pd
+
+    # Clean the dataset
+    data.dropna(inplace=True)
+
+    # Convert the goal to binary outcome
+    data['income'goal] = data['income'goal].apply(lambda x: 1 if x == ">50K" else 0)
+
+
+    # Encode the protected attribute (e.g., 'race')
+    protected_attr = data['sex'protected]
+    le = LabelEncoder()
+    protected_attr = le.fit_transform(protected_attr)
+
+    outcomes = data['income'goal]
+
+
+    # Calculate disparate impact ratio
+    ratio = disparate_impact_ratio(y_true=outcomes, y_pred=outcomes, prot_attr=protected_attr)
+    print(f"Disparate Impact Ratio (Race): {ratio:.2f}")
+
+def ratio(data, QI, Protected, goal, outcome):
+#TODO make the fucntion work with the variables
+#in this function returns the disparte impact ratio of the dataset. the goal must be the the overal target (doesn't have to be the target for the model) (for example income)
+#the goal needs to be a binary outcome, the outcome needs to be the favorable outcome (for exmaple above 50K). the QI needs to be the the quasile attribute (for example sex) and Protected needs to be the protected class (for example female)
+    data.dropna(inplace=True)
+
+    # Convert income to binary outcome
+    data['binary'goal] = data['binary'goal].apply(lambda x: 1 if x == "oneoftwovalues"outcome else 0)
+
+    # Protected attribute: Sex
+    protected_attr = data['qi'QI].apply(lambda x: 1 if x == "Protected"Protected else 0)
+    outcomes = data['income'goal]
+
+    # Calculate disparate impact ratio
+    ratio = disparate_impact_ratio(y_true=outcomes, y_pred=outcomes, prot_attr=protected_attr)
+    return ratio
+
+
+#commented out the train_model function as it is not used in the code and might still be usefull lateron (i realized i was overthinking the implementation of disparate impact)
+
+#from sklearn.model_selection import train_test_split
+#from sklearn.ensemble import RandomForestClassifier
+#from sklearn.preprocessing import OneHotEncoder
+#from sklearn.compose import ColumnTransformer
+#from sklearn.pipeline import Pipeline
+
+#def train_model(data, categorical_features):
+#    """
+#    Train a machine learning model to predict the sensitive attribute.
+#    Returns the predicted values (y_pred) and actual values (A).
+#    """
+#    # Exclude the sensitive attribute from the features
+#    X = np.delete(data, SA_INDEX, axis=1)  # Features
+#    A = data[:, SA_INDEX]  # Actual sensitive attribute values
+#
+#    # Split the data into training and testing sets
+#    X_train, X_test, A_train, A_test = train_test_split(X, A, test_size=0.2, random_state=42)#
+
+    # Adjust categorical feature indices after removing the sensitive attribute
+#    adjusted_categorical_features = [i if i < SA_INDEX else i - 1 for i in categorical_features]
+#
+#    # Define the column transformer to handle categorical features
+#    preprocessor = ColumnTransformer(
+#        transformers=[
+#            ('cat', OneHotEncoder(handle_unknown='ignore'), adjusted_categorical_features)
+#        ],
+#        remainder='passthrough'
+#    )
+
+    # Create a pipeline with the preprocessor and the model
+#    model = Pipeline(steps=[
+#        ('preprocessor', preprocessor),
+#        ('classifier', RandomForestClassifier())
+#    ])
+
+    # Train the model
+#    model.fit(X_train, A_train)
+
+    # Make predictions on the test set
+#    y_pred = model.predict(X_test)
+
+#    return y_pred, A_test
 
 def choose_dimension(partition):
     """
