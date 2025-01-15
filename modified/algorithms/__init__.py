@@ -25,6 +25,7 @@ def k_anonymize(anon_params):
             anon_params["sa_index"])
 
     if anon_params["name"] == AnonMethod.MODIFIED_MONDRIAN:
+#todo: add the parameters that are needed for the protected atttributes
         return basic_mondrian_anonymize(
             anon_params["value"],
             anon_params["att_trees"],
