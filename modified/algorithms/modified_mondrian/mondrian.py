@@ -70,7 +70,11 @@ def get_normalized_width(partition, index):
     return width * 1.0 / QI_RANGE[index]
 
 def altRatio(data, QI, Protected, goal, outcome):
-    import pandas as pd
+#Todo start using this one,
+#add if statement and make it 1 (most ideal) if return is nan
+#check if return type is float or INT
+#combine with normalize width or choose dimension (look back into this) to check combine this with the width for feature selection.
+#figure out way to get goal, outcome, and protected down here (i currently can't find where these parameters are passed)
 
     # Clean the dataset
     data.dropna(inplace=True)
