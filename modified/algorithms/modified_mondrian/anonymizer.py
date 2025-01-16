@@ -28,7 +28,7 @@ def extend_result(val):
 
 
 
-def modified_mondrian_anonymize(k, att_trees, data, qi_index, sa_index, ATT_NAMES, Protected_att, goal, outcome, **kwargs):
+def modified_mondrian_anonymize(k, att_trees, data, qi_index, sa_index, ATT_NAMES, QID_NAMES, Protected_att, goal, outcome, **kwargs):
     """
     modified Mondrian with K-Anonymity
     """
@@ -36,7 +36,7 @@ def modified_mondrian_anonymize(k, att_trees, data, qi_index, sa_index, ATT_NAME
     result, runtime = mondrian(
         att_trees, 
         reorder_columns(copy.deepcopy(data), qi_index), 
-        k, len(qi_index), sa_index, ATT_NAMES, Protected_att, goal, outcome)
+        k, len(qi_index), sa_index, ATT_NAMES, QID_NAMES, Protected_att, goal, outcome)
 
     return restore_column_order(result, qi_index), runtime
 

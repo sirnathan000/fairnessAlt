@@ -71,13 +71,17 @@ def get_normalized_width(partition, index):
         width = partition.width[index]
     return width * 1.0 / QI_RANGE[index]
 
-def altRatio(data, QI, Protected, goal, outcome):
+def altRatio(partition, QID_NAMES, goal, outcome):
 #Todo start using this one,
 #add if statement and make it 1 (most ideal) if return is nan
 #check if return type is float or INT
-#combine with normalize width or choose dimension (look back into this) to check combine this with the width for feature selection.
-#figure out way to get goal, outcome, and protected down here (i currently can't find where these parameters are passed)
+#combine with normalize width or choose dimension (look back into this) to check combine this with the width for feature selection. DONE
+#figure out way to get goal, outcome, and protected down here (i currently can't find where these parameters are passed) DONE
+
+
     # need to change this back into pandas dataframe otherwise the aif360 will not work
+    # TO CHANGE THIS I NEED TO USE THE partion.member[index] as this is how the data is actually formed
+    data = partition.member[index]
     columns = []
     data = pd.DataFrame(data, columns=columns)
 
@@ -91,7 +95,7 @@ def altRatio(data, QI, Protected, goal, outcome):
 
 
     # Encode the protected attribute (e.g., 'race')
-    protected_attr = data[Protected]
+    protected_attr = data[QID_NAMES]
     le = LabelEncoder()
     protected_attr = le.fit_transform(protected_attr)
 
@@ -101,7 +105,10 @@ def altRatio(data, QI, Protected, goal, outcome):
     # Calculate disparate impact ratio
     ratio = disparate_impact_ratio(y_true=outcomes, y_pred=outcomes, prot_attr=protected_attr)
     print(f"Disparate Impact Ratio (Race): {ratio:.2f}")
+    return ratio
 
+""""
+this function is not used in the code and might still be usefull lateron
 def ratio(data, QI, Protected, goal, outcome):
 #TODO make the fucntion work with the variables
 #in this function returns the disparte impact ratio of the dataset. the goal must be the the overal target (doesn't have to be the target for the model) (for example income)
@@ -118,7 +125,7 @@ def ratio(data, QI, Protected, goal, outcome):
     # Calculate disparate impact ratio
     ratio = disparate_impact_ratio(y_true=outcomes, y_pred=outcomes, prot_attr=protected_attr)
     return ratio
-
+"""
 
 #commented out the train_model function as it is not used in the code and might still be usefull lateron (i realized i was overthinking the implementation of disparate impact)
 
@@ -165,17 +172,25 @@ def ratio(data, QI, Protected, goal, outcome):
 
 #    return y_pred, A_test
 
-def choose_dimension(partition):
+def choose_dimension(partition, QID_NAMES, Protected_att, goal, outcome):
     """
     chooss dim with largest normlized Width
     return dim index.
     """
+    #TODO add the ratioALT function and make it 1-ratio as the highest width is selected. to ensuer that they never superseed th max of 1 the
+    #TODO ratio and the width need to be set to 0.5*ratio + 0.5*width for the ones without a protected attribute it should be 0.5*width to ensure that the protected attribute is always selected first.
     max_width = -1
     max_dim = -1
     for i in range(QI_LEN):
         if partition.allow[i] == 0:
             continue
         normWidth = get_normalized_width(partition, i)
+#        print("the selected QI is:", QID_NAMES[i])
+#THIS IS HERE FOR WHEN I HAVE COLLECTED THE ORIGINAL ORDER SO I CAN COMPARE
+#        if QID_NAMES[i] is in Protected_att:
+#            print("in choose_dimension Protected_att": QID_NAMES[i])
+#           ratio = altRatio(partition, QID_NAMES[i], goal, outcome)
+#            normWidth = 0.5*normWidth + 0.5*ratio
         if normWidth > max_width:
             max_width = normWidth
             max_dim = i
@@ -185,6 +200,8 @@ def choose_dimension(partition):
     if max_dim == -1:
         print("cannot find the max dim")
         pdb.set_trace()
+#    print(f"Selected dimension (quasi-identifier attribute): {ATT_NAMES[max_dim]}")
+    print("the eventually selected QI is:", QID_NAMES[max_dim])
     return max_dim
 
 
@@ -372,7 +389,7 @@ def split_partition(partition, dim):
         return split_categorical(partition, dim, pwidth, pmiddle)
 
 
-def anonymize(partition):
+def anonymize(partition,QID_NAMES, Protected_att, goal, outcome):
     """
     Main procedure of Half_Partition.
     recursively partition groups until not allowable.
@@ -381,17 +398,17 @@ def anonymize(partition):
         RESULT.append(partition)
         return
     # Choose dim
-    dim = choose_dimension(partition)
+    dim = choose_dimension(partition, QID_NAMES, Protected_att, goal, outcome)
     if dim == -1:
         print("Error: dim=-1")
         pdb.set_trace()
     sub_partitions = split_partition(partition, dim)
     if len(sub_partitions) == 0:
         partition.allow[dim] = 0
-        anonymize(partition)
+        anonymize(partition, QID_NAMES, Protected_att, goal, outcome)
     else:
         for sub_p in sub_partitions:
-            anonymize(sub_p)
+            anonymize(sub_p, QID_NAMES, Protected_att, goal, outcome)
 
 
 def check_splitable(partition):
@@ -460,7 +477,7 @@ def check_L_diversity(partition):
             return False
     return True
 
-def mondrian(att_trees, data, k, QI_num, SA_num,ATT_NAMES, Protected_att, goal, outcome):
+def mondrian(att_trees, data, k, QI_num, SA_num,ATT_NAMES, QID_NAMES, Protected_att, goal, outcome):
     """
     basic Mondrian for k-anonymity.
     This fuction support both numeric values and categoric values.
@@ -483,9 +500,11 @@ def mondrian(att_trees, data, k, QI_num, SA_num,ATT_NAMES, Protected_att, goal, 
 #    print(SA_INDEX)
 #    print(SA_num)
     print("this is att_names in modified_mondrian:", ATT_NAMES)
+    print("this is QID_NAMES in modified mondrian:", QID_NAMES)
     print("this is portected in modified mondrian:", Protected_att)
     print("this is goal in modified mondrian:", goal)
     print("this is outcome in modified mondrian:",outcome)
+    print("ITWORKSAGIAN")
 #    print(data)
 
     for i in tqdm(range(QI_LEN)):
@@ -499,7 +518,7 @@ def mondrian(att_trees, data, k, QI_num, SA_num,ATT_NAMES, Protected_att, goal, 
             middle.append('*')
     whole_partition = Partition(data, wtemp, middle)
     start_time = time.time()
-    anonymize(whole_partition)
+    anonymize(whole_partition,QID_NAMES, Protected_att, goal, outcome)
     rtime = float(time.time() - start_time)
     for partition in RESULT:
         temp = partition.middle

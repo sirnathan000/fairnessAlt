@@ -62,6 +62,9 @@ class Anonymizer:
         outcome = ">50K"
         #end of hardcoded attributes
         QI_NAMES = list(np.array(ATT_NAMES)[QI_INDEX])
+        QID_NAMES = [str(name) for name in QI_NAMES]
+#        print("these are the QID names:", QID_NAMES, "with length:", len(QID_NAMES))
+#        print("these are the QI names:", QI_NAMES, "with length:", len(QI_NAMES))
         IS_CAT = [True] * len(QI_INDEX) # is all cat because all hierarchies are provided
         SA_INDEX = [index for index in range(len(ATT_NAMES)) if index not in QI_INDEX]
         SA_var = [ATT_NAMES[i] for i in SA_INDEX]
@@ -92,6 +95,7 @@ class Anonymizer:
 
         if self.method == AnonMethod.MODIFIED_MONDRIAN:
             anon_params.update({'ATT_NAMES': ATT_NAMES})
+            anon_params.update({'QID_NAMES': QID_NAMES})
             anon_params.update({'Protected_att': Protected_att})
             anon_params.update({'goal': goal})
             anon_params.update({'outcome': outcome})

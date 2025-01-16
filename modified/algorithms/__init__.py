@@ -39,6 +39,7 @@ def k_anonymize(anon_params):
             anon_params["qi_index"],
             anon_params["sa_index"],
             anon_params["ATT_NAMES"],
+            anon_params["QID_NAMES"],
             anon_params["Protected_att"],
             anon_params["goal"],
             anon_params["outcome"])
