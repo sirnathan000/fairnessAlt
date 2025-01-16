@@ -16,6 +16,7 @@ from .models.numrange import NumRange
 from .utils.utility import cmp_str
 
 #for ratio
+import pandas as pd
 from sklearn.preprocessing import LabelEncoder
 from aif360.sklearn.metrics import disparate_impact_ratio
 
@@ -61,6 +62,7 @@ def get_normalized_width(partition, index):
     return Normalized width of partition
     similar to NCP
     """
+    #print(partition.member[index])
     if IS_CAT[index] is False:
         low = partition.width[index][0]
         high = partition.width[index][1]
@@ -75,20 +77,25 @@ def altRatio(data, QI, Protected, goal, outcome):
 #check if return type is float or INT
 #combine with normalize width or choose dimension (look back into this) to check combine this with the width for feature selection.
 #figure out way to get goal, outcome, and protected down here (i currently can't find where these parameters are passed)
+    # need to change this back into pandas dataframe otherwise the aif360 will not work
+    columns = []
+    data = pd.DataFrame(data, columns=columns)
 
-    # Clean the dataset
+
+
+# Clean the dataset
     data.dropna(inplace=True)
 
     # Convert the goal to binary outcome
-    data['income'goal] = data['income'goal].apply(lambda x: 1 if x == ">50K" else 0)
+    data[goal] = data[goal].apply(lambda x: 1 if x == outcome else 0)
 
 
     # Encode the protected attribute (e.g., 'race')
-    protected_attr = data['sex'protected]
+    protected_attr = data[Protected]
     le = LabelEncoder()
     protected_attr = le.fit_transform(protected_attr)
 
-    outcomes = data['income'goal]
+    outcomes = data[goal]
 
 
     # Calculate disparate impact ratio
@@ -102,11 +109,11 @@ def ratio(data, QI, Protected, goal, outcome):
     data.dropna(inplace=True)
 
     # Convert income to binary outcome
-    data['binary'goal] = data['binary'goal].apply(lambda x: 1 if x == "oneoftwovalues"outcome else 0)
+    data[goal] = data[goal].apply(lambda x: 1 if x == outcome else 0)
 
     # Protected attribute: Sex
-    protected_attr = data['qi'QI].apply(lambda x: 1 if x == "Protected"Protected else 0)
-    outcomes = data['income'goal]
+    protected_attr = data[QI].apply(lambda x: 1 if x == Protected else 0)
+    outcomes = data[goal]
 
     # Calculate disparate impact ratio
     ratio = disparate_impact_ratio(y_true=outcomes, y_pred=outcomes, prot_attr=protected_attr)
@@ -453,7 +460,7 @@ def check_L_diversity(partition):
             return False
     return True
 
-def mondrian(att_trees, data, k, QI_num, SA_num):
+def mondrian(att_trees, data, k, QI_num, SA_num,ATT_NAMES, Protected_att, goal, outcome):
     """
     basic Mondrian for k-anonymity.
     This fuction support both numeric values and categoric values.
@@ -465,11 +472,26 @@ def mondrian(att_trees, data, k, QI_num, SA_num):
     result = []
     middle = []
     wtemp = []
+    print("this is the print in modified_mondrian")
+    #print(att_trees)
+
+#   quasi_identifier_names = [data.columns[i] for i in range(QI_LEN)]
+#    print(QI_LEN)
+#    print(QI_num)
+#    print(k)
+#    print(IS_CAT)
+#    print(SA_INDEX)
+#    print(SA_num)
+    print("this is att_names in modified_mondrian:", ATT_NAMES)
+    print("this is portected in modified mondrian:", Protected_att)
+    print("this is goal in modified mondrian:", goal)
+    print("this is outcome in modified mondrian:",outcome)
+#    print(data)
     for i in tqdm(range(QI_LEN)):
         if IS_CAT[i] is False:
             QI_RANGE.append(ATT_TREES[i].range)
             wtemp.append((0, len(ATT_TREES[i].sort_value) - 1))
-            middle.append(ATT_TREES[i].value)
+            middle.append(ATT_TRin the mondrian.py does it select the higher or lower width for anonymization?EES[i].value)
         else:
             QI_RANGE.append(len(ATT_TREES[i]['*']))
             wtemp.append(len(ATT_TREES[i]['*']))

@@ -316,6 +316,7 @@ def mondrian(data, k, relax=False, QI_num=-1):
     But in relaxed mondrian, lhs may be have intersection with rhs.
     """
     init(data, k, QI_num)
+    print("this is the print in mondrian")
     result = []
     data_size = len(data)
     low = [0] * QI_LEN

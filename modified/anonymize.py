@@ -52,11 +52,15 @@ class Anonymizer:
     def anonymize(self):
         data = pd.read_csv(self.data_path, delimiter=';')
         ATT_NAMES = list(data.columns)
-        
+        print(ATT_NAMES)
         data_params = get_dataset_params(self.data_name)
         QI_INDEX = data_params['qi_index']
         IS_CAT2 = data_params['is_category']
-
+        #currently these attribute is hardcoded to work with the adult dataset
+        Protected_att = ['sex', 'race']
+        goal = ['income']
+        outcome = ">50K"
+        #end of hardcoded attributes
         QI_NAMES = list(np.array(ATT_NAMES)[QI_INDEX])
         IS_CAT = [True] * len(QI_INDEX) # is all cat because all hierarchies are provided
         SA_INDEX = [index for index in range(len(ATT_NAMES)) if index not in QI_INDEX]
@@ -85,6 +89,12 @@ class Anonymizer:
             mapping_dict,raw_data = numberize_categories(raw_data, QI_INDEX, SA_INDEX, IS_CAT2)
             anon_params.update({'mapping_dict': mapping_dict})
             anon_params.update({'is_cat': IS_CAT2})
+
+        if self.method == AnonMethod.MODIFIED_MONDRIAN:
+            anon_params.update({'ATT_NAMES': ATT_NAMES})
+            anon_params.update({'Protected_att': Protected_att})
+            anon_params.update({'goal': goal})
+            anon_params.update({'outcome': outcome})
 
         if self.method == AnonMethod.DATAFLY:
             anon_params.update({
