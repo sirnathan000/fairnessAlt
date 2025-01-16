@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 """
-run basic_mondrian with given parameters
+run modified_mondrian with given parameters
 """
 import copy
 from pdb import run
 import sys
 import os
-
+sys.path.insert(1, os.path.join(sys.path[0], 'modified_mondrian'))
 from .mondrian import mondrian, mondrian_l_diversity
 
-sys.path.insert(1, os.path.join(sys.path[0], '..'))
+#sys.path.insert(1, os.path.join(sys.path[0], '..'))
 from utils.data import reorder_columns, restore_column_order
 
 
@@ -26,9 +26,9 @@ def extend_result(val):
     return val
 
 
-def basic_mondrian_anonymize(k, att_trees, data, qi_index, sa_index, **kwargs):
+def modified_mondrian_anonymize(k, att_trees, data, qi_index, sa_index, **kwargs):
     """
-    Basic Mondrian with K-Anonymity
+    modified Mondrian with K-Anonymity
     """
     result, runtime = mondrian(
         att_trees, 

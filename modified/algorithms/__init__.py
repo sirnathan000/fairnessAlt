@@ -1,6 +1,7 @@
 from algorithms.datafly import datafly_anonymize
 from .mondrian import classic_mondrian_anonymize
 from .basic_mondrian import basic_mondrian_anonymize, read_tree, mondrian_ldiv_anonymize
+from .modified_mondrian import modified_mondrian_anonymize, read_tree, mondrian_ldiv_anonymize
 from .clustering_based import cluster_based_anonymize
 from .top_down_greedy import tdg_anonymize
 from utils.types import AnonMethod
@@ -26,7 +27,7 @@ def k_anonymize(anon_params):
 
     if anon_params["name"] == AnonMethod.MODIFIED_MONDRIAN:
 #todo: add the parameters that are needed for the protected atttributes
-        return basic_mondrian_anonymize(
+        return modified_mondrian_anonymize(
             anon_params["value"],
             anon_params["att_trees"],
             anon_params["data"],

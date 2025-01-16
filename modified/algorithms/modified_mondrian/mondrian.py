@@ -80,15 +80,15 @@ def altRatio(data, QI, Protected, goal, outcome):
     data.dropna(inplace=True)
 
     # Convert the goal to binary outcome
-    data['income'goal] = data['income'goal].apply(lambda x: 1 if x == ">50K" else 0)
+    data[goal] = data[goal].apply(lambda x: 1 if x == outcome else 0)
 
 
     # Encode the protected attribute (e.g., 'race')
-    protected_attr = data['sex'protected]
+    protected_attr = data[Protected]
     le = LabelEncoder()
     protected_attr = le.fit_transform(protected_attr)
 
-    outcomes = data['income'goal]
+    outcomes = data[goal]
 
 
     # Calculate disparate impact ratio
@@ -102,11 +102,11 @@ def ratio(data, QI, Protected, goal, outcome):
     data.dropna(inplace=True)
 
     # Convert income to binary outcome
-    data['binary'goal] = data['binary'goal].apply(lambda x: 1 if x == "oneoftwovalues"outcome else 0)
+    data[goal] = data[goal].apply(lambda x: 1 if x == outcome else 0)
 
     # Protected attribute: Sex
-    protected_attr = data['qi'QI].apply(lambda x: 1 if x == "Protected"Protected else 0)
-    outcomes = data['income'goal]
+    protected_attr = data[QI].apply(lambda x: 1 if x == Protected else 0)
+    outcomes = data[goal]
 
     # Calculate disparate impact ratio
     ratio = disparate_impact_ratio(y_true=outcomes, y_pred=outcomes, prot_attr=protected_attr)
@@ -465,6 +465,7 @@ def mondrian(att_trees, data, k, QI_num, SA_num):
     result = []
     middle = []
     wtemp = []
+    print("this is the print in modified_mondrian")
     for i in tqdm(range(QI_LEN)):
         if IS_CAT[i] is False:
             QI_RANGE.append(ATT_TREES[i].range)
