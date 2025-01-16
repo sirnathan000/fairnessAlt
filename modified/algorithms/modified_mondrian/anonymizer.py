@@ -26,9 +26,13 @@ def extend_result(val):
     return val
 
 
+<<<<<<< HEAD
 
 
 def modified_mondrian_anonymize(k, att_trees, data, qi_index, sa_index, ATT_NAMES, Protected_att, goal, outcome, **kwargs):
+=======
+def modified_mondrian_anonymize(k, att_trees, data, qi_index, sa_index, **kwargs):
+>>>>>>> 09f01cb19a511a0e2545f63dff7c7670d6155fcb
     """
     modified Mondrian with K-Anonymity
     """

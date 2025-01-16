@@ -473,6 +473,7 @@ def mondrian(att_trees, data, k, QI_num, SA_num,ATT_NAMES, Protected_att, goal, 
     middle = []
     wtemp = []
     print("this is the print in modified_mondrian")
+<<<<<<< HEAD
     #print(att_trees)
 
 #   quasi_identifier_names = [data.columns[i] for i in range(QI_LEN)]
@@ -487,6 +488,8 @@ def mondrian(att_trees, data, k, QI_num, SA_num,ATT_NAMES, Protected_att, goal, 
     print("this is goal in modified mondrian:", goal)
     print("this is outcome in modified mondrian:",outcome)
 #    print(data)
+=======
+>>>>>>> 09f01cb19a511a0e2545f63dff7c7670d6155fcb
     for i in tqdm(range(QI_LEN)):
         if IS_CAT[i] is False:
             QI_RANGE.append(ATT_TREES[i].range)
