@@ -27,14 +27,11 @@ def k_anonymize(anon_params):
 
     if anon_params["name"] == AnonMethod.MODIFIED_MONDRIAN:
 #todo: add the parameters that are needed for the protected atttributes
-<<<<<<< HEAD
         #print(anon_params["data"])
         #print(anon_params["value"])
         #print(anon_params["att_trees"])
         #print(anon_params["qi_index"])
         print("this is ATT_Names in the init:", anon_params["ATT_NAMES"])
-=======
->>>>>>> 09f01cb19a511a0e2545f63dff7c7670d6155fcb
         return modified_mondrian_anonymize(
             anon_params["value"],
             anon_params["att_trees"],
