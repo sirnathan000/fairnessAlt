@@ -81,9 +81,10 @@ def altRatio(partition, QID_NAMES, goal, outcome):
 
     # need to change this back into pandas dataframe otherwise the aif360 will not work
     # TO CHANGE THIS I NEED TO USE THE partion.member[index] as this is how the data is actually formed
-    data = partition.member[index]
-    columns = []
-    data = pd.DataFrame(data, columns=columns)
+#    data = partition.member[index]
+#todo change the columns into the attribute names
+    columns = ['sex','age','race','marital-status','education','native-country','workclass','occupation','value','salary-class']
+    data = pd.DataFrame(partition.member, columns=columns)
 
 
 
@@ -91,6 +92,9 @@ def altRatio(partition, QID_NAMES, goal, outcome):
     data.dropna(inplace=True)
 
     # Convert the goal to binary outcome
+    print(goal)
+    print(outcome)
+    print(QID_NAMES)
     data[goal] = data[goal].apply(lambda x: 1 if x == outcome else 0)
 
 
@@ -185,12 +189,16 @@ def choose_dimension(partition, QID_NAMES, Protected_att, goal, outcome):
         if partition.allow[i] == 0:
             continue
         normWidth = get_normalized_width(partition, i)
-#        print("the selected QI is:", QID_NAMES[i])
+#       print("the selected QI is:", QID_NAMES[i])
 #THIS IS HERE FOR WHEN I HAVE COLLECTED THE ORIGINAL ORDER SO I CAN COMPARE
-#        if QID_NAMES[i] is in Protected_att:
-#            print("in choose_dimension Protected_att": QID_NAMES[i])
-#           ratio = altRatio(partition, QID_NAMES[i], goal, outcome)
-#            normWidth = 0.5*normWidth + 0.5*ratio
+        if QID_NAMES[i] in Protected_att:
+            print("in choose_dimension Protected_att:", QID_NAMES[i])
+            ratio = altRatio(partition, QID_NAMES[i], goal, outcome)
+            normWidth = 0.5*normWidth + 0.5*ratio
+            if normWidth > max_width:
+                max_width = normWidth
+                max_dim = i
+
         if normWidth > max_width:
             max_width = normWidth
             max_dim = i
@@ -201,7 +209,7 @@ def choose_dimension(partition, QID_NAMES, Protected_att, goal, outcome):
         print("cannot find the max dim")
         pdb.set_trace()
 #    print(f"Selected dimension (quasi-identifier attribute): {ATT_NAMES[max_dim]}")
-    print("the eventually selected QI is:", QID_NAMES[max_dim])
+#    print("the eventually selected QI is:", QID_NAMES[max_dim])
     return max_dim
 
 
@@ -394,6 +402,9 @@ def anonymize(partition,QID_NAMES, Protected_att, goal, outcome):
     Main procedure of Half_Partition.
     recursively partition groups until not allowable.
     """
+#    print("Partition member records:")
+#    for record in partition.member:
+#        print(record)
     if check_splitable(partition) is False:
         RESULT.append(partition)
         return

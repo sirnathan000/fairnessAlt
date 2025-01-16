@@ -58,7 +58,7 @@ class Anonymizer:
         IS_CAT2 = data_params['is_category']
         #currently these attribute is hardcoded to work with the adult dataset
         Protected_att = ['sex', 'race']
-        goal = ['income']
+        goal = 'salary-class'
         outcome = ">50K"
         #end of hardcoded attributes
         QI_NAMES = list(np.array(ATT_NAMES)[QI_INDEX])
