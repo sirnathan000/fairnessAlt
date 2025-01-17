@@ -16,6 +16,7 @@ from .models.numrange import NumRange
 from .utils.utility import cmp_str
 
 #for ratio
+import numpy as np
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder
 from aif360.sklearn.metrics import disparate_impact_ratio
@@ -92,11 +93,18 @@ def altRatio(partition, QID_NAMES, goal, outcome):
     data.dropna(inplace=True)
 
     # Convert the goal to binary outcome
-    print(goal)
-    print(outcome)
-    print(QID_NAMES)
-    data[goal] = data[goal].apply(lambda x: 1 if x == outcome else 0)
+#    print("input for goal is ",goal)
+#    print("input for outcome is ",outcome)
+#    print("input for QUID_Names is ",QID_NAMES)
+#    print(data.head())
+#    data[goal] = data[goal].apply(lambda x: 1 if x == outcome else 0)
 
+    if outcome not in data[goal].values:
+#        print(f"Warning: Outcome value '{outcome}' not found in goal column")
+        return 0.00
+# Convert the goal to binary outcome
+    data[goal] = data[goal].apply(lambda x: 1 if str(x).strip().lower() == str(outcome).strip().lower() else 0)
+#    print("data[goal] outputs:", data[goal], "and the count is:", data[goal].value_counts())
 
     # Encode the protected attribute (e.g., 'race')
     protected_attr = data[QID_NAMES]
@@ -105,11 +113,36 @@ def altRatio(partition, QID_NAMES, goal, outcome):
 
     outcomes = data[goal]
 
-
+#    print("the outcome var for ratio is:", outcomes)
+#    print("the protected var for ratio is:", protected_attr)
+#    print("the goal var is:", goal)
+#    ratio = 0.50
+#    ratio = float(ratio)
+#    return ratio
+#    the problem with returning nan is here
+    if len(outcomes) == 0 or len(protected_attr) == 0:
+ #       print("Warning: Empty slices detected in outcomes or protected_attr")
+        ratio = 0.00
+        ratio = float(ratio)
+        return ratio
     # Calculate disparate impact ratio
-    ratio = disparate_impact_ratio(y_true=outcomes, y_pred=outcomes, prot_attr=protected_attr)
-    print(f"Disparate Impact Ratio (Race): {ratio:.2f}")
-    return ratio
+    try:
+        ratio = disparate_impact_ratio(y_true=outcomes, y_pred=outcomes, prot_attr=protected_attr)
+        ratio = float(ratio)
+        if np.isnan(ratio):
+#            print("Warning: Disparate Impact Ratio calculation resulted in nan")
+            ratio = 0.00
+            ratio = float(ratio)
+            return ratio
+#        print(f"Disparate Impact Ratio (Race): {ratio:.2f}")
+        return ratio
+    except Exception as e:
+#       print(f"Error calculating Disparate Impact Ratio: {e}")
+        ratio = 0.00
+        ratio = float(ratio)
+        return ratio
+
+
 
 """"
 this function is not used in the code and might still be usefull lateron
@@ -188,16 +221,16 @@ def choose_dimension(partition, QID_NAMES, Protected_att, goal, outcome):
     for i in range(QI_LEN):
         if partition.allow[i] == 0:
             continue
+#todo normWidth for non-protected is two high set to 0.5* so it is more accurate and in same ratio with the protected attribute
         normWidth = get_normalized_width(partition, i)
 #       print("the selected QI is:", QID_NAMES[i])
 #THIS IS HERE FOR WHEN I HAVE COLLECTED THE ORIGINAL ORDER SO I CAN COMPARE
         if QID_NAMES[i] in Protected_att:
-            print("in choose_dimension Protected_att:", QID_NAMES[i])
+#            print("in choose_dimension Protected_att:", QID_NAMES[i])
             ratio = altRatio(partition, QID_NAMES[i], goal, outcome)
-            normWidth = 0.5*normWidth + 0.5*ratio
-            if normWidth > max_width:
-                max_width = normWidth
-                max_dim = i
+            normWidth = 0.5*normWidth + 0.5*(1-ratio)
+        else:
+            normWidth = 0.5*normWidth
 
         if normWidth > max_width:
             max_width = normWidth
@@ -209,7 +242,7 @@ def choose_dimension(partition, QID_NAMES, Protected_att, goal, outcome):
         print("cannot find the max dim")
         pdb.set_trace()
 #    print(f"Selected dimension (quasi-identifier attribute): {ATT_NAMES[max_dim]}")
-#    print("the eventually selected QI is:", QID_NAMES[max_dim])
+    print("the eventually selected QI is:", QID_NAMES[max_dim])
     return max_dim
 
 
