@@ -39,6 +39,15 @@ def get_dataset_params(name):
         target_var = "disease"
         IS_CAT = [False, True, False]
         max_numeric = {"age": 50, "city_birth": None, "zip_code":50000}
+    elif name == Dataset.FOLKSTABLE:
+#QI_index show the actual indices of the quasi-identifiers in the data
+        QI_INDEX = [1, 2, 3, 4, 6, 7]
+#target_var is the variable we want to predict
+        target_var = "PINCP"
+#IS_CAT is a list of booleans that show if the quasi-identifier is categorical or not
+        IS_CAT = [True, True, True, True, True, True]
+#max_numeric is a dictionary that shows the maximum value of the quasi-identifiers
+        max_numeric = {}
     else:
         print(f"Not support {name} dataset")
         raise ValueError
