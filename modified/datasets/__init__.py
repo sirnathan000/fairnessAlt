@@ -9,6 +9,7 @@ def get_dataset_params(name):
         max_numeric = {"age": 50.5}
     elif name == Dataset.ADULT2:
         #todo: add the necessary information to make the ratio work alternatively run the ratio here and pass it allong (dumb thing to do but hey if it works it works)
+        #became null and void
         QI_INDEX = [1, 2, 3, 4, 5, 6, 7, 8]
         target_var = 'salary-class'
         IS_CAT = [True, False, True, True, True, True, True, True]
@@ -41,13 +42,24 @@ def get_dataset_params(name):
         max_numeric = {"age": 50, "city_birth": None, "zip_code":50000}
     elif name == Dataset.FOLKSTABLE:
 #QI_index show the actual indices of the quasi-identifiers in the data
-        QI_INDEX = [1, 2, 3, 4, 6, 7]
+        QI_INDEX = [1, 2, 3, 4, 9, 10]
 #target_var is the variable we want to predict
         target_var = "PINCP"
 #IS_CAT is a list of booleans that show if the quasi-identifier is categorical or not
         IS_CAT = [True, True, True, True, True, True]
 #max_numeric is a dictionary that shows the maximum value of the quasi-identifiers
         max_numeric = {}
+
+    elif name == Dataset.STUDENT:
+# QI_index show the actual indices of the quasi-identifiers in the data
+#todo update the QI_index to the correct values
+        QI_INDEX = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 13, 19, 20, 21, 23, 29]
+#target_var is the variable we want to predict
+        target_var = "G3"
+#IS_CAT is a list of booleans that show if the quasi-identifier is categorical or not
+        IS_CAT = [True, True, False, True, True, True, False, False, True, True, True, False, False, False, False, False, False]
+#max_numeric is a dictionary that shows the maximum value of the quasi-identifiers
+        max_numeric = {"age": 23, "Medu": 4, "Fedu": 4, "traveltime": 6, "activities": None, "nursery": None, "higher":None, "romantic": None, "health": 5 }
     else:
         print(f"Not support {name} dataset")
         raise ValueError

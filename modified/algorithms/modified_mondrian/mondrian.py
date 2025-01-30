@@ -73,55 +73,29 @@ def get_normalized_width(partition, index):
     return width * 1.0 / QI_RANGE[index]
 
 def altRatio(partition, QID_NAMES, goal, outcome):
-#Todo start using this one,
-#add if statement and make it 1 (most ideal) if return is nan
-#check if return type is float or INT
-#combine with normalize width or choose dimension (look back into this) to check combine this with the width for feature selection. DONE
-#figure out way to get goal, outcome, and protected down here (i currently can't find where these parameters are passed) DONE
-
-
-    # need to change this back into pandas dataframe otherwise the aif360 will not work
-    # TO CHANGE THIS I NEED TO USE THE partion.member[index] as this is how the data is actually formed
-#    data = partition.member[index]
-#todo change the columns into the attribute names
-    columns = ['sex','age','race','marital-status','education','native-country','workclass','occupation','value','salary-class']
+    #a nice to have would be to push these attributes from the initilization.
+#Attributes for Folkstable dataset
+#    columns = ['ID', 'AGEP', 'COW', 'SCHL', 'MAR', 'OCCP', 'POBP', 'RELP', 'WKHP', 'SEX', 'RAC1P', 'PINCP']
+#Attributes for student dataset
+    columns = ['ID', 'school', 'sex', 'age', 'address', 'famsize', 'Pstatus', 'Medu', 'Fedu', 'Mjob', 'Fjob', 'reason', 'guardian', 'traveltime', 'studytime', 'failures', 'schoolsup', 'famsup', 'paid', 'activities', 'nursery', 'higher', 'internet', 'romantic', 'famrel', 'freetime', 'goout', 'Dalc', 'Walc', 'health', 'absences', 'G1', 'G2', 'G3']
     data = pd.DataFrame(partition.member, columns=columns)
 
 
 
-# Clean the dataset
+# here any empty rows are dropped if necessary (this should not be necassary but it can still happen if inproper cleaning has been applied)
     data.dropna(inplace=True)
 
-    # Convert the goal to binary outcome
-#    print("input for goal is ",goal)
-#    print("input for outcome is ",outcome)
-#    print("input for QUID_Names is ",QID_NAMES)
-#    print(data.head())
-#    data[goal] = data[goal].apply(lambda x: 1 if x == outcome else 0)
-
     if outcome not in data[goal].values:
-#        print(f"Warning: Outcome value '{outcome}' not found in goal column")
         return 0.00
-# Convert the goal to binary outcome
+# Convert the goal to binary outcome as a bool didn't always work.
     data[goal] = data[goal].apply(lambda x: 1 if str(x).strip().lower() == str(outcome).strip().lower() else 0)
-#    print("data[goal] outputs:", data[goal], "and the count is:", data[goal].value_counts())
-
     # Encode the protected attribute (e.g., 'race')
     protected_attr = data[QID_NAMES]
     le = LabelEncoder()
     protected_attr = le.fit_transform(protected_attr)
 
     outcomes = data[goal]
-
-#    print("the outcome var for ratio is:", outcomes)
-#    print("the protected var for ratio is:", protected_attr)
-#    print("the goal var is:", goal)
-#    ratio = 0.50
-#    ratio = float(ratio)
-#    return ratio
-#    the problem with returning nan is here
     if len(outcomes) == 0 or len(protected_attr) == 0:
- #       print("Warning: Empty slices detected in outcomes or protected_attr")
         ratio = 0.00
         ratio = float(ratio)
         return ratio
@@ -130,108 +104,32 @@ def altRatio(partition, QID_NAMES, goal, outcome):
         ratio = disparate_impact_ratio(y_true=outcomes, y_pred=outcomes, prot_attr=protected_attr)
         ratio = float(ratio)
         if np.isnan(ratio):
-#            print("Warning: Disparate Impact Ratio calculation resulted in nan")
             ratio = 0.00
             ratio = float(ratio)
             return ratio
-#        print(f"Disparate Impact Ratio (Race): {ratio:.2f}")
         return ratio
     except Exception as e:
-#       print(f"Error calculating Disparate Impact Ratio: {e}")
         ratio = 0.00
         ratio = float(ratio)
         return ratio
 
-
-
-""""
-this function is not used in the code and might still be usefull lateron
-def ratio(data, QI, Protected, goal, outcome):
-#TODO make the fucntion work with the variables
-#in this function returns the disparte impact ratio of the dataset. the goal must be the the overal target (doesn't have to be the target for the model) (for example income)
-#the goal needs to be a binary outcome, the outcome needs to be the favorable outcome (for exmaple above 50K). the QI needs to be the the quasile attribute (for example sex) and Protected needs to be the protected class (for example female)
-    data.dropna(inplace=True)
-
-    # Convert income to binary outcome
-    data[goal] = data[goal].apply(lambda x: 1 if x == outcome else 0)
-
-    # Protected attribute: Sex
-    protected_attr = data[QI].apply(lambda x: 1 if x == Protected else 0)
-    outcomes = data[goal]
-
-    # Calculate disparate impact ratio
-    ratio = disparate_impact_ratio(y_true=outcomes, y_pred=outcomes, prot_attr=protected_attr)
-    return ratio
-"""
-
-#commented out the train_model function as it is not used in the code and might still be usefull lateron (i realized i was overthinking the implementation of disparate impact)
-
-#from sklearn.model_selection import train_test_split
-#from sklearn.ensemble import RandomForestClassifier
-#from sklearn.preprocessing import OneHotEncoder
-#from sklearn.compose import ColumnTransformer
-#from sklearn.pipeline import Pipeline
-
-#def train_model(data, categorical_features):
-#    """
-#    Train a machine learning model to predict the sensitive attribute.
-#    Returns the predicted values (y_pred) and actual values (A).
-#    """
-#    # Exclude the sensitive attribute from the features
-#    X = np.delete(data, SA_INDEX, axis=1)  # Features
-#    A = data[:, SA_INDEX]  # Actual sensitive attribute values
-#
-#    # Split the data into training and testing sets
-#    X_train, X_test, A_train, A_test = train_test_split(X, A, test_size=0.2, random_state=42)#
-
-    # Adjust categorical feature indices after removing the sensitive attribute
-#    adjusted_categorical_features = [i if i < SA_INDEX else i - 1 for i in categorical_features]
-#
-#    # Define the column transformer to handle categorical features
-#    preprocessor = ColumnTransformer(
-#        transformers=[
-#            ('cat', OneHotEncoder(handle_unknown='ignore'), adjusted_categorical_features)
-#        ],
-#        remainder='passthrough'
-#    )
-
-    # Create a pipeline with the preprocessor and the model
-#    model = Pipeline(steps=[
-#        ('preprocessor', preprocessor),
-#        ('classifier', RandomForestClassifier())
-#    ])
-
-    # Train the model
-#    model.fit(X_train, A_train)
-
-    # Make predictions on the test set
-#    y_pred = model.predict(X_test)
-
-#    return y_pred, A_test
-
 def choose_dimension(partition, QID_NAMES, Protected_att, goal, outcome):
     """
-    chooss dim with largest normlized Width
+    chooss dim with largest normlized Width and the most unfair. the ratio here is 50/50 it could be adjusted depending on the needs
     return dim index.
     """
-    #TODO add the ratioALT function and make it 1-ratio as the highest width is selected. to ensuer that they never superseed th max of 1 the
-    #TODO ratio and the width need to be set to 0.5*ratio + 0.5*width for the ones without a protected attribute it should be 0.5*width to ensure that the protected attribute is always selected first.
     max_width = -1
     max_dim = -1
     for i in range(QI_LEN):
         if partition.allow[i] == 0:
             continue
-#todo normWidth for non-protected is two high set to 0.5* so it is more accurate and in same ratio with the protected attribute
         normWidth = get_normalized_width(partition, i)
-#       print("the selected QI is:", QID_NAMES[i])
-#THIS IS HERE FOR WHEN I HAVE COLLECTED THE ORIGINAL ORDER SO I CAN COMPARE
         if QID_NAMES[i] in Protected_att:
-#            print("in choose_dimension Protected_att:", QID_NAMES[i])
             ratio = altRatio(partition, QID_NAMES[i], goal, outcome)
             normWidth = 0.5*normWidth + 0.5*(1-ratio)
         else:
             normWidth = 0.5*normWidth
-
+#        print(f"Dimension: {i}, Allowed: {partition.allow[i]}, NormWidth: {normWidth}")
         if normWidth > max_width:
             max_width = normWidth
             max_dim = i
@@ -239,10 +137,24 @@ def choose_dimension(partition, QID_NAMES, Protected_att, goal, outcome):
         print("Error: max_width > 1")
         pdb.set_trace()
     if max_dim == -1:
-        print("cannot find the max dim")
-        pdb.set_trace()
-#    print(f"Selected dimension (quasi-identifier attribute): {ATT_NAMES[max_dim]}")
-    print("the eventually selected QI is:", QID_NAMES[max_dim])
+        print("cannot find the max dim so continue with default selection")
+        #this was added to make sure that the code doesn't break when the max_dim is not found and hopefully the k-anonymity is still preserved
+        #this has prevented it from breaking. in theory it should not be reached but in practices it seems there are scenarious where this does happen
+        for i in range(QI_LEN):
+            if partition.allow[i] == 0:
+                continue
+            normWidth = get_normalized_width(partition, i)
+            if normWidth > max_width:
+                max_width = normWidth
+                max_dim = i
+            print(f"Dimension: {i}, Allowed: {partition.allow[i]}, NormWidth: {normWidth}")
+        if max_width > 1:
+            print("Error: max_width > 1")
+            pdb.set_trace()
+        if max_dim == -1:
+            print("cannot find the max dim")
+            pdb.set_trace()
+        return max_dim
     return max_dim
 
 

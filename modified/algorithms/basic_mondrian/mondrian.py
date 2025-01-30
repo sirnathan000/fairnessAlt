@@ -78,12 +78,14 @@ def choose_dimension(partition):
         if normWidth > max_width:
             max_width = normWidth
             max_dim = i
+#        print(f"Dimension: {i}, Allowed: {partition.allow[i]}, NormWidth: {normWidth}")
     if max_width > 1:
         print("Error: max_width > 1")
         pdb.set_trace()
     if max_dim == -1:
         print("cannot find the max dim")
         pdb.set_trace()
+#    print("the eventually selected QI is:", max_dim)
     return max_dim
 
 
