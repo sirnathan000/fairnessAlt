@@ -45,5 +45,11 @@ to run this project the following need to be installed using pip.
 3. f1 score https://scikit-learn.org/1.5/modules/generated/sklearn.metrics.f1_score.html
 4. pandas
 5. numpy
+6. install folkstable https://github.com/socialfoundations/folktables/blob/main/README.md
+
+## how to recreate dataset
+to recreate the data set you need to install all the requirments and run the following commands in /modified/data
+python3 extract_student.py
+python3 folkstable_extraction.py
 
 
