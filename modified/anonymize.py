@@ -22,7 +22,7 @@ parser.add_argument('--dataset', type=str, default='adult',
 class Anonymizer:
     def __init__(self, args):
         self.method = args.method
-        assert self.method in ["mondrian", "topdown", "cluster", "mondrian_ldiv", "classic_mondrian", "datafly", "modified_mondrian"]
+        assert self.method in ["mondrian", "topdown", "cluster", "mondrian_ldiv", "classic_mondrian", "datafly", "modified_mondrian", "alt_modified_mondrian"]
         self.k = args.k
         self.data_name = args.dataset
         self.csv_path = args.dataset+'.csv'
@@ -60,17 +60,19 @@ class Anonymizer:
 #        Protected_att = ['SEX', 'RAC1P']
 #        goal = 'PINCP'
 #        outcome = "True"
+        # this is only for the alt_modified_mondrian
+#        names = ['ID', 'AGEP', 'COW', 'SCHL', 'MAR', 'OCCP', 'POBP', 'RELP', 'WKHP', 'SEX', 'RAC1P', 'PINCP']
         #end of hardcoded attributes
         #current hardcoded attributes for the student dataset
         Protected_att = ['sex', 'age']
         goal = 'G3'
         outcome = "True"
+        #this is only for the alt_modified_mondrian
+        names = ['ID', 'school', 'sex', 'age', 'address', 'famsize', 'Pstatus', 'Medu', 'Fedu', 'Mjob', 'Fjob', 'reason', 'guardian', 'traveltime', 'studytime', 'failures', 'schoolsup', 'famsup', 'paid', 'activities', 'nursery', 'higher', 'internet', 'romantic', 'famrel', 'freetime', 'goout', 'Dalc', 'Walc', 'health', 'absences', 'G1', 'G2', 'G3']
         #end of hardcoded attributes
 
         QI_NAMES = list(np.array(ATT_NAMES)[QI_INDEX])
         QID_NAMES = [str(name) for name in QI_NAMES]
-#        print("these are the QID names:", QID_NAMES, "with length:", len(QID_NAMES))
-#        print("these are the QI names:", QI_NAMES, "with length:", len(QI_NAMES))
         IS_CAT = [True] * len(QI_INDEX) # is all cat because all hierarchies are provided
         SA_INDEX = [index for index in range(len(ATT_NAMES)) if index not in QI_INDEX]
         SA_var = [ATT_NAMES[i] for i in SA_INDEX]
@@ -105,6 +107,14 @@ class Anonymizer:
             anon_params.update({'Protected_att': Protected_att})
             anon_params.update({'goal': goal})
             anon_params.update({'outcome': outcome})
+
+        if self.method == AnonMethod.ALT_MODIFIED_MONDRIAN:
+            anon_params.update({'ATT_NAMES': ATT_NAMES})
+            anon_params.update({'QID_NAMES': QID_NAMES})
+            anon_params.update({'Protected_att': Protected_att})
+            anon_params.update({'goal': goal})
+            anon_params.update({'outcome': outcome})
+            anon_params.update({'names': names})
 
         if self.method == AnonMethod.DATAFLY:
             anon_params.update({
