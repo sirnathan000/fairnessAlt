@@ -1,3 +1,5 @@
+# old info from original repo that this was forked from
+
 # Data anonymization using k-Anonymity
 ## ✔️ Experiments
 - Provides 5 k-anonymization method: 
